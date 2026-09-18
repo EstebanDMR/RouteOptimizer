@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Graph } from '@shared/graph/Graph';
 import { dijkstra } from '@shared/algorithms/dijkstra';
 import { astar } from '@shared/algorithms/astar';
-import { zeroHeuristic } from '@shared/algorithms/heuristics';
+import { zeroHeuristic, calculateSafeScaleFactor } from '@shared/algorithms/heuristics';
 import { compareAlgorithms } from '@shared/algorithms/compare';
 
 describe('Pathfinding Algorithms: Dijkstra & A*', () => {
@@ -157,5 +157,58 @@ describe('Pathfinding Algorithms: Dijkstra & A*', () => {
     expect(comparison.astar.totalDistance).toBe(9);
     expect(typeof comparison.visitedNodesDelta).toBe('number');
     expect(typeof comparison.examinedEdgesDelta).toBe('number');
+  });
+
+  it('strictly rejects metric "time" in A* to preserve admissible Euclidean distance units', () => {
+    const graph = createDiamondGraph();
+    // Forzar time mediante as any para probar el guardián de runtime
+    expect(() =>
+      astar(graph, 'A', 'D', { metric: 'time' as unknown as 'distance' })
+    ).toThrow('A* solo admite la métrica "distance"');
+  });
+
+  it('preserves full floating point precision in calculateSafeScaleFactor without upward rounding', () => {
+    // Si weight es 10 y rawDistance es 15, ratio exacto = 2/3 = 0.6666666666666666
+    // Un redondeo con toFixed(4) daría 0.6667, que es SUPERIOR a 2/3 y viola admisibilidad
+    const graph = new Graph();
+    graph.addNode({ id: 'N1', label: 'N1', x: 0, y: 0 });
+    graph.addNode({ id: 'N2', label: 'N2', x: 15, y: 0 });
+    graph.addEdge({ id: 'e12', from: 'N1', to: 'N2', weight: 10 });
+
+    const safeFactor = (astar(graph, 'N1', 'N2') as unknown as { executionTimeMs: number });
+    expect(safeFactor).toBeDefined();
+
+    // Verificamos directamente con la función calculateSafeScaleFactor
+    const factor = calculateSafeScaleFactor(graph.toJSON());
+
+    expect(factor).toBeLessThanOrEqual(10 / 15);
+    expect(factor).toBeCloseTo(2 / 3, 10);
+    // Verificar explícitamente que no se redondeó hacia arriba
+    expect(factor).not.toBe(0.6667);
+  });
+
+  it('handles calculateSafeScaleFactor edge cases: empty graph, identical coordinates, zero weight', () => {
+    // 1. Grafo sin aristas
+    expect(calculateSafeScaleFactor({ nodes: [], edges: [] })).toBe(1.0);
+
+    // 2. Nodos con coordenadas idénticas (distancia = 0)
+    const sameCoordGraph = {
+      nodes: [
+        { id: 'A', label: 'A', x: 50, y: 50 },
+        { id: 'B', label: 'B', x: 50, y: 50 },
+      ],
+      edges: [{ id: 'e1', from: 'A', to: 'B', weight: 10 }],
+    };
+    expect(calculateSafeScaleFactor(sameCoordGraph)).toBe(1.0);
+
+    // 3. Arista con peso 0 (h(n) = 0 es estrictamente admisible)
+    const zeroWeightGraph = {
+      nodes: [
+        { id: 'A', label: 'A', x: 0, y: 0 },
+        { id: 'B', label: 'B', x: 10, y: 0 },
+      ],
+      edges: [{ id: 'e1', from: 'A', to: 'B', weight: 0 }],
+    };
+    expect(calculateSafeScaleFactor(zeroWeightGraph)).toBe(0);
   });
 });

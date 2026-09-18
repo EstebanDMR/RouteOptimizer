@@ -4,7 +4,7 @@ export interface QueueElement<T> {
 }
 
 /**
- * MinPriorityQueue implementada desde cero sobre un Min-Heap Binario indexado.
+ * MinPriorityQueue implementada desde cero sobre un Min-Heap Binario (Binary Min-Heap).
  * Garantiza:
  * - push: O(log n)
  * - pop: O(log n)

@@ -6,16 +6,18 @@ import { MinPriorityQueue } from './priorityQueue';
 export interface AStarOptions {
   heuristic?: HeuristicFn;
   scaleFactor?: number;
-  metric?: 'distance' | 'time';
+  metric?: 'distance';
 }
 
 /**
  * Implementación manual de A* (A-Star) para caminos mínimos con función heurística.
  * f(n) = g(n) + h(n)
  * donde:
- *   g(n) = costo real acumulado desde el origen hasta n
- *   h(n) = estimación heurística admisible desde n hasta el destino
+ *   g(n) = costo real acumulado desde el origen hasta n (distancia)
+ *   h(n) = estimación heurística admisible desde n hasta el destino (distancia en línea recta)
  *
+ * Optimiza estrictamente por distancia (metric: 'distance') para garantizar que g(n) y h(n)
+ * compartan la misma unidad métrica dimensional, preservando la admisibilidad y consistencia.
  * Registra cada paso cronológico para reproducción visual fidedigna en la UI.
  */
 export function astar(
@@ -26,6 +28,11 @@ export function astar(
 ): AlgorithmResult {
   const startTime = performance.now();
   const graph = graphInput instanceof Graph ? graphInput : new Graph(graphInput);
+
+  // Validación de métrica soportada
+  if (options.metric && (options.metric as string) !== 'distance') {
+    throw new Error('A* solo admite la métrica "distance" para garantizar la admisibilidad y consistencia de la heurística euclidiana.');
+  }
 
   // Validación de existencia de nodos
   if (!graph.hasNode(startNodeId)) {
@@ -148,7 +155,7 @@ export function astar(
     for (const neighbor of neighbors) {
       const v = neighbor.nodeId;
       const vNode = graph.getNode(v)!;
-      const edgeWeight = options.metric === 'time' ? neighbor.time : neighbor.weight;
+      const edgeWeight = neighbor.weight; // Siempre utiliza distancia
       const edgeTime = neighbor.time;
 
       examinedEdges.push({ from: u, to: v });

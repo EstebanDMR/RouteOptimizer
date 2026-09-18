@@ -62,7 +62,7 @@ export const ComplexityAnalysis: React.FC = () => {
                 O((V + E) log V)
               </p>
               <p className="text-slate-400 text-[11px]">
-                Utilizando una cola de prioridad basada en Min-Heap binario indexado. Cada vértice se extrae una vez (V log V) y cada arista se relaja a lo sumo una vez (E log V).
+                Utilizando una cola de prioridad basada en Min-Heap binario (Binary Min-Heap). Cada vértice se extrae una vez (V log V) y cada arista se relaja a lo sumo una vez (E log V).
               </p>
             </div>
 

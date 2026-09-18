@@ -54,7 +54,7 @@ El proyecto sigue una arquitectura unificada con **una sola fuente de verdad par
 ┌─────────────────────────────────────────────────────────────┐
 │                    shared/ (Core Engine)                    │
 │  - Graph (Listas de Adyacencia y validación de integridad)  │
-│  - MinPriorityQueue (Min-Heap binario indexado O(log n))    │
+│  - MinPriorityQueue (Min-Heap binario O(log n))             │
 │  - Dijkstra (Búsqueda no informada con step recording)      │
 │  - A* (Búsqueda heurística desacoplada f(n) = g(n) + h(n))  │
 │  - Heuristics (Euclidiana admisible, Manhattan y escala)    │
@@ -117,7 +117,7 @@ private adjacency: Map<string, Map<string, NeighborInfo>> = new Map();
 
 ## 6. Cola de Prioridad Mínima (`MinPriorityQueue`)
 
-Ambos algoritmos requieren extraer reiteradamente el vértice con menor costo estimado. Se implementó un **Min-Heap Binario indexado sobre un array dinámico** desde cero:
+Ambos algoritmos requieren extraer reiteradamente el vértice con menor costo estimado. Se implementó un **Min-Heap binario sobre un array dinámico** (Binary Min-Heap) desde cero:
 
 * **Índices del árbol**:
   * Padre de $i$: $\lfloor(i - 1) / 2\rfloor$
@@ -152,7 +152,7 @@ $$f(n) = g(n) + h(n)$$
 * **$f(n)$**: Costo total estimado del camino que pasa por $n$. Se utiliza como prioridad en el Min-Heap.
 
 ### Admisibilidad y Consistencia de la Heurística
-Para garantizar que A* encuentre el camino óptimo sin visitar vértices de más:
+Para que A* garantice encontrar el camino óptimo manteniendo su propiedad de optimalidad:
 1. **Admisibilidad**: $h(n) \le h^*(n)$ (la heurística nunca sobreestima la distancia real a la meta).
 2. **Consistencia (Monotonía)**: Satisface la desigualdad triangular:
    $$h(u) \le w(u, v) + h(v)$$
@@ -162,7 +162,7 @@ Para garantizar que A* encuentre el camino óptimo sin visitar vértices de más
 > 
 > Para grafos sintéticos con coordenadas arbitrarias, el sistema calcula un factor de escala seguro:
 > $$\alpha = \min \left(1.0, \min_{(u, v) \in E} \frac{w(u, v)}{d_E(u, v)}\right)$$
-> garantizando matemáticamente que $h(n) = d_E(n, \text{destino}) \times \alpha$ sea siempre **admisible** y **consistente**.
+> garantizando matemáticamente que $h(n) = d_E(n, \text{destino}) \times \alpha$ sea siempre **admisible** y **consistente**, preservando la precisión completa de punto flotante sin redondeos espurios hacia arriba.
 
 ---
 
@@ -185,7 +185,7 @@ Para garantizar que A* encuentre el camino óptimo sin visitar vértices de más
 RouteOptimizer no declara un "ganador universal" ni utiliza el tiempo de CPU como criterio definitivo. La comparación se basa en métricas estructurales:
 
 1. **Optimalidad idéntica**: Ambos algoritmos encuentran exactamente la misma distancia total cuando la heurística es admisible ($d_{\text{Dijkstra}} = d_{\text{A*}}$).
-2. **Nodos visitados (Carga de Búsqueda)**: En escenarios donde la meta tiene una dirección espacial clara, A* explora significativamente menos nodos que Dijkstra al no expandir en direcciones contrarias al objetivo.
+2. **Nodos visitados (Carga de Búsqueda)**: En escenarios donde la geometría orienta adecuadamente hacia la meta, A* suele explorar sustancialmente menos nodos que Dijkstra al podar direcciones opuestas. En escenarios con obstáculos severos o rutas con desvíos forzados, la cantidad de nodos explorados puede aproximarse a la de Dijkstra manteniendo en todo momento la optimalidad.
 3. **Aristas examinadas**: Refleja la cantidad de inspecciones y evaluaciones de relajación requeridas.
 4. **Tiempo de CPU**: Se reporta como métrica experimental complementaria, advirtiendo sobre su dependencia de la carga del procesador.
 

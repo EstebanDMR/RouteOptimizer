@@ -78,6 +78,23 @@ describe('Express Backend API Endpoints', () => {
     expect(result.unreachable).toBe(false);
   });
 
+  it('POST /api/algorithms/astar rejects metric "time" with HTTP 400', async () => {
+    const payload = {
+      graph: smallCityScenario.graph,
+      startNodeId: 'A',
+      targetNodeId: 'J',
+      metric: 'time',
+    };
+
+    const res = await request(app)
+      .post('/api/algorithms/astar')
+      .send(payload);
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error).toContain('A* solo admite la optimización por "distance"');
+  });
+
   it('POST /api/algorithms/compare compares Dijkstra and A* on identical graph', async () => {
     const payload = {
       graph: smallCityScenario.graph,

@@ -5,7 +5,7 @@ import { AlgorithmRequest } from '@shared/types/graph';
 
 export class AlgorithmController {
   public executeDijkstra(req: Request, res: Response): void {
-    const validation = validateAlgorithmRequest(req.body);
+    const validation = validateAlgorithmRequest(req.body, 'dijkstra');
     if (!validation.isValid) {
       res.status(validation.statusCode || 400).json({
         success: false,
@@ -30,7 +30,7 @@ export class AlgorithmController {
   }
 
   public executeAStar(req: Request, res: Response): void {
-    const validation = validateAlgorithmRequest(req.body);
+    const validation = validateAlgorithmRequest(req.body, 'astar');
     if (!validation.isValid) {
       res.status(validation.statusCode || 400).json({
         success: false,
@@ -55,7 +55,7 @@ export class AlgorithmController {
   }
 
   public executeCompare(req: Request, res: Response): void {
-    const validation = validateAlgorithmRequest(req.body);
+    const validation = validateAlgorithmRequest(req.body, 'compare');
     if (!validation.isValid) {
       res.status(validation.statusCode || 400).json({
         success: false,

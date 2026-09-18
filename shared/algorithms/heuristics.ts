@@ -52,37 +52,54 @@ export const zeroHeuristic: HeuristicFn = (): number => 0;
  * Calcula dinámicamente un scaleFactor seguro para el grafo, garantizando
  * que h(n) nunca sobreestime el costo de ninguna arista directa:
  * alpha = min(1.0, min_{(u,v) in E} (weight(u,v) / euclideanDistance(u,v)))
+ *
+ * Mantiene la precisión completa de punto flotante (sin redondeos hacia arriba con toFixed)
+ * para preservar estrictamente la admisibilidad matemática (h(n) <= h*(n)).
  */
 export function calculateSafeScaleFactor(graph: GraphData): number {
-  if (!graph.edges || graph.edges.length === 0) {
+  if (!graph || !graph.edges || graph.edges.length === 0 || !graph.nodes || graph.nodes.length === 0) {
     return 1.0;
   }
 
   const nodeMap = new Map<string, GraphNode>();
   for (const n of graph.nodes) {
-    nodeMap.set(n.id, n);
+    if (n && n.id) {
+      nodeMap.set(n.id, n);
+    }
   }
 
   let minRatio = 1.0;
 
   for (const edge of graph.edges) {
+    if (!edge || typeof edge.weight !== 'number' || !Number.isFinite(edge.weight) || edge.weight < 0) {
+      continue;
+    }
+
     const fromNode = nodeMap.get(edge.from);
     const toNode = nodeMap.get(edge.to);
 
-    if (fromNode && toNode) {
+    if (
+      fromNode &&
+      toNode &&
+      Number.isFinite(fromNode.x) &&
+      Number.isFinite(fromNode.y) &&
+      Number.isFinite(toNode.x) &&
+      Number.isFinite(toNode.y)
+    ) {
       const dx = fromNode.x - toNode.x;
       const dy = fromNode.y - toNode.y;
-      const rawDistance = Math.sqrt(dx * dx + dy * dy);
+      const rawDistance = Math.hypot(dx, dy);
 
-      if (rawDistance > 0.001) {
+      // Si los nodos tienen las mismas coordenadas (distancia 0), se omite para evitar división por cero
+      if (rawDistance > 0) {
         const ratio = edge.weight / rawDistance;
-        if (ratio < minRatio) {
+        if (Number.isFinite(ratio) && ratio < minRatio) {
           minRatio = ratio;
         }
       }
     }
   }
 
-  // Redondear a 4 decimales para estabilidad numérica
-  return Math.max(0.0001, Number(minRatio.toFixed(4)));
+  // Preserva precisión completa sin redondear hacia arriba con toFixed()
+  return Math.max(0, minRatio);
 }

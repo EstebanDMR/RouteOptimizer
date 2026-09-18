@@ -64,6 +64,7 @@ export interface AlgorithmRequest {
   graph: GraphData;
   startNodeId: string;
   targetNodeId: string;
+  metric?: 'distance' | 'time';
 }
 
 export interface ScenarioPreset {

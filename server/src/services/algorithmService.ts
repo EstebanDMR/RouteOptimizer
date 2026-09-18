@@ -9,7 +9,9 @@ import { compareAlgorithms } from '@shared/algorithms/compare';
 
 export class AlgorithmService {
   public runDijkstra(request: AlgorithmRequest): AlgorithmResult {
-    return dijkstra(request.graph, request.startNodeId, request.targetNodeId);
+    return dijkstra(request.graph, request.startNodeId, request.targetNodeId, {
+      metric: request.metric,
+    });
   }
 
   public runAStar(request: AlgorithmRequest): AlgorithmResult {
