@@ -210,7 +210,7 @@ RouteOptimizer no declara un "ganador universal" ni utiliza el tiempo de CPU com
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/RouteOptimizer.git
+   git clone https://github.com/EstebanDMR/RouteOptimizer.git
    cd RouteOptimizer
    ```
 
