@@ -15,9 +15,6 @@ export const Header: React.FC = () => {
               <h1 className="text-base font-bold text-slate-100 tracking-tight font-sans">
                 RouteOptimizer
               </h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-sky-950 text-sky-400 border border-sky-800/60">
-                v1.0 • Portfolio Project
-              </span>
             </div>
             <p className="text-xs text-slate-400 font-normal">
               Planificación y optimización de rutas con algoritmos de grafos y búsqueda heurística

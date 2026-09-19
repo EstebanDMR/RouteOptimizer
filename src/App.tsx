@@ -385,18 +385,6 @@ export const App: React.FC = () => {
         <ComplexityAnalysis />
       </main>
 
-      {/* Cinta / Ticker Marquee Full-Width al estilo del portafolio */}
-      <div className="w-full bg-slate-900/90 border-y border-slate-800 py-2.5 overflow-hidden select-none">
-        <div className="animate-marquee font-mono text-xs text-slate-400 tracking-wider">
-          <span className="inline-block px-4">
-            ✦ ROUTE OPTIMIZER ✦ MOTOR DE GRAFOS Y BÚSQUEDA HEURÍSTICA ✦ DIJKSTRA O((V + E) LOG V) ✦ A* CON HEURÍSTICA EUCLIDIANA ADMISIBLE ✦ MIN-HEAP BINARIO DESDE CERO ✦ VISUALIZACIÓN INTERACTIVA PASO A PASO ✦ TYPESCRIPT FULLSTACK • REACT • NODE.JS • EXPRESS ✦ ESTEBAN DMR
-          </span>
-          <span className="inline-block px-4">
-            ✦ ROUTE OPTIMIZER ✦ MOTOR DE GRAFOS Y BÚSQUEDA HEURÍSTICA ✦ DIJKSTRA O((V + E) LOG V) ✦ A* CON HEURÍSTICA EUCLIDIANA ADMISIBLE ✦ MIN-HEAP BINARIO DESDE CERO ✦ VISUALIZACIÓN INTERACTIVA PASO A PASO ✦ TYPESCRIPT FULLSTACK • REACT • NODE.JS • EXPRESS ✦ ESTEBAN DMR
-          </span>
-        </div>
-      </div>
-
       {/* Footer Minimalista */}
       <footer className="w-full border-t border-slate-900 bg-slate-950 py-4 px-4 sm:px-6 lg:px-8 xl:px-10 text-center text-xs font-mono text-slate-500">
         <p>
