@@ -68,24 +68,41 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     }
   };
 
+  // Conversión exacta de coordenadas de pantalla a coordenadas del viewBox SVG (0 0 900 600)
+  const getSVGCoordinates = useCallback((e: React.MouseEvent<SVGSVGElement>): { x: number; y: number } | null => {
+    if (!svgRef.current) return null;
+    const svg = svgRef.current;
+    const ctm = svg.getScreenCTM();
+    if (ctm) {
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      const svgPoint = pt.matrixTransform(ctm.inverse());
+      return { x: svgPoint.x, y: svgPoint.y };
+    }
+    // Fallback matemático estándar
+    const rect = svg.getBoundingClientRect();
+    const scaleX = 900 / (rect.width || 1);
+    const scaleY = 600 / (rect.height || 1);
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  }, []);
+
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGSVGElement>) => {
       if (!draggingNodeId || !svgRef.current || !onNodePositionChange) return;
 
-      const rect = svgRef.current.getBoundingClientRect();
-      // Mapear coordenadas de pantalla al viewBox (0 0 900 600)
-      const scaleX = 900 / rect.width;
-      const scaleY = 600 / rect.height;
+      const coords = getSVGCoordinates(e);
+      if (!coords) return;
 
-      const rawX = (e.clientX - rect.left) * scaleX;
-      const rawY = (e.clientY - rect.top) * scaleY;
-
-      const clampedX = Math.round(Math.max(30, Math.min(870, rawX)));
-      const clampedY = Math.round(Math.max(30, Math.min(570, rawY)));
+      const clampedX = Math.round(Math.max(30, Math.min(870, coords.x)));
+      const clampedY = Math.round(Math.max(30, Math.min(570, coords.y)));
 
       onNodePositionChange(draggingNodeId, clampedX, clampedY);
     },
-    [draggingNodeId, onNodePositionChange]
+    [draggingNodeId, onNodePositionChange, getSVGCoordinates]
   );
 
   const handleMouseUp = () => {
@@ -94,12 +111,9 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
   const handleCanvasClick = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current || !onCanvasClickInEditor) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const scaleX = 900 / rect.width;
-    const scaleY = 600 / rect.height;
-    const x = Math.round((e.clientX - rect.left) * scaleX);
-    const y = Math.round((e.clientY - rect.top) * scaleY);
-    onCanvasClickInEditor(x, y);
+    const coords = getSVGCoordinates(e);
+    if (!coords) return;
+    onCanvasClickInEditor(Math.round(coords.x), Math.round(coords.y));
   };
 
   const handleNodeClick = (e: React.MouseEvent, id: string) => {
@@ -114,7 +128,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   return (
-    <div className="relative w-full h-[580px] bg-slate-950 border border-slate-800 rounded-xl overflow-hidden select-none shadow-inner">
+    <div className="relative w-full h-[520px] sm:h-[580px] lg:h-[620px] xl:h-[680px] 2xl:h-[740px] bg-slate-950 border border-slate-800 rounded-xl overflow-hidden select-none shadow-inner">
       {/* SVG Canvas */}
       <svg
         ref={svgRef}

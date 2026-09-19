@@ -256,7 +256,7 @@ export const App: React.FC = () => {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-sky-500 selection:text-white">
       <Header />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-6 space-y-6">
         {/* 1. Selector de Escenario y Botones de Ejecución */}
         <ScenarioSelector
           scenarios={scenarios}
@@ -275,9 +275,9 @@ export const App: React.FC = () => {
         />
 
         {/* 2. Área Central: Lienzo de Grafo y Controles de Reproducción */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Columna Izquierda / Central: Visualizador y Controles (2/3 ancho en desktop) */}
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Columna Izquierda / Central: Visualizador y Controles */}
+          <div className="lg:col-span-8 xl:col-span-8 2xl:col-span-9 space-y-4">
             {/* Barra de Herramientas del Editor */}
             <GraphEditorToolbar
               mode={editorMode}
@@ -322,8 +322,47 @@ export const App: React.FC = () => {
             />
           </div>
 
-          {/* Columna Derecha: Panel de Resultados y Comparativa (1/3 ancho en desktop) */}
-          <div className="space-y-6">
+          {/* Columna Derecha: Panel de Métricas, Resultados y Comparativa */}
+          <div className="lg:col-span-4 xl:col-span-4 2xl:col-span-3 space-y-5">
+            {/* Panel de Telemetría y Topología estilo Portafolio */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  Topología y Telemetría
+                </span>
+                <span className="flex items-center space-x-1.5 text-emerald-400 text-[11px]">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Activo</span>
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px] mb-0.5">ESCENARIO</span>
+                  <span className="text-slate-200 font-semibold truncate block">
+                    {scenarios.find((s) => s.id === currentScenarioId)?.name || 'Personalizado'}
+                  </span>
+                </div>
+                <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px] mb-0.5">TOPOLOGÍA</span>
+                  <span className="text-slate-200 font-semibold block">
+                    {graph.nodes.length} V • {graph.edges.length} E
+                  </span>
+                </div>
+                <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px] mb-0.5">ORIGEN</span>
+                  <span className="text-emerald-400 font-semibold block truncate">
+                    {startNodeId} ({graph.nodes.find((n) => n.id === startNodeId)?.label || 'Nodo'})
+                  </span>
+                </div>
+                <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80">
+                  <span className="text-slate-500 block text-[10px] mb-0.5">DESTINO</span>
+                  <span className="text-rose-400 font-semibold block truncate">
+                    {targetNodeId} ({graph.nodes.find((n) => n.id === targetNodeId)?.label || 'Nodo'})
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <ResultsPanel result={result} />
             {comparisonResult && <AlgorithmComparison comparison={comparisonResult} />}
           </div>
@@ -346,8 +385,20 @@ export const App: React.FC = () => {
         <ComplexityAnalysis />
       </main>
 
+      {/* Cinta / Ticker Marquee Full-Width al estilo del portafolio */}
+      <div className="w-full bg-slate-900/90 border-y border-slate-800 py-2.5 overflow-hidden select-none">
+        <div className="animate-marquee font-mono text-xs text-slate-400 tracking-wider">
+          <span className="inline-block px-4">
+            ✦ ROUTE OPTIMIZER ✦ MOTOR DE GRAFOS Y BÚSQUEDA HEURÍSTICA ✦ DIJKSTRA O((V + E) LOG V) ✦ A* CON HEURÍSTICA EUCLIDIANA ADMISIBLE ✦ MIN-HEAP BINARIO DESDE CERO ✦ VISUALIZACIÓN INTERACTIVA PASO A PASO ✦ TYPESCRIPT FULLSTACK • REACT • NODE.JS • EXPRESS ✦ ESTEBAN DMR
+          </span>
+          <span className="inline-block px-4">
+            ✦ ROUTE OPTIMIZER ✦ MOTOR DE GRAFOS Y BÚSQUEDA HEURÍSTICA ✦ DIJKSTRA O((V + E) LOG V) ✦ A* CON HEURÍSTICA EUCLIDIANA ADMISIBLE ✦ MIN-HEAP BINARIO DESDE CERO ✦ VISUALIZACIÓN INTERACTIVA PASO A PASO ✦ TYPESCRIPT FULLSTACK • REACT • NODE.JS • EXPRESS ✦ ESTEBAN DMR
+          </span>
+        </div>
+      </div>
+
       {/* Footer Minimalista */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs font-mono text-slate-500">
+      <footer className="w-full border-t border-slate-900 bg-slate-950 py-4 px-4 sm:px-6 lg:px-8 xl:px-10 text-center text-xs font-mono text-slate-500">
         <p>
           RouteOptimizer • Proyecto 3 Portafolio • Algoritmos y Estructuras de Datos desde Cero
         </p>
